@@ -2,109 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
   <title>Jimmy in the House</title>
   <link rel="icon" type="image/png" href="logo.jpg" />
-  <style>
-    :root {
-      --bg: #5b2aa8;
-      --text: #ffffff;
-      --muted: rgba(255,255,255,0.85);
-      --btn: #3aa0ff;
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: var(--bg);
-      color: var(--text);
-      display: grid; place-items: center;
-      padding: 24px;
-    }
-    .wrap { width: min(720px, 96vw); text-align: center; }
-    .top { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px; }
-    .logo { width: 56px; height: 56px; border-radius: 12px; object-fit: cover; border: 2px solid rgba(255,255,255,0.6); }
-    h1 { margin: 0; font-size: clamp(22px, 4vw, 34px); }
-    p.sub { margin: 6px 0 18px; color: var(--muted); }
-    #thought {
-      min-height: 64px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      font-size: clamp(18px, 2.5vw, 24px); line-height: 1.4;
-    }
-    #generate-btn {
-      margin-top: 14px; padding: 12px 18px; font-weight: 700; font-size: 16px;
-      background: var(--btn); color: #fff; border: 0; border-radius: 10px; cursor: pointer;
-    }
-    #generate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .hint { margin-top: 10px; color: var(--muted); font-size: 13px; }
-  </style>
+  <meta name="theme-color" content="#5b2aa8" />
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Jimmy" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="msapplication-TileColor" content="#5b2aa8" />
+  <meta name="msapplication-tap-highlight" content="no" />
+  
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="logo.jpg" />
+  <link rel="apple-touch-icon" sizes="152x152" href="logo.jpg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg" />
+  <link rel="apple-touch-icon" sizes="167x167" href="logo.jpg" />
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="banner-simple.css?v=3" />
 </head>
 <body>
-  <main class="wrap">
+  <main class="wrap" role="main">
     <div class="top">
       <img src="logo.jpg" alt="Jimmy logo" class="logo" />
       <h1>Welcome to Jimmy in the House</h1>
     </div>
-    <p class="sub">You Thought of the Day.</p>
+
+    <p class="sub">Your Thought of the Day</p>
 
     <div id="thought" aria-live="polite" aria-atomic="true">Loading thoughts…</div>
-    <button id="generate-btn" aria-label="Generate a thought" disabled>New Thought</button>
-    <div class="hint">Tip: press Space for another. .</div>
+    <div class="hint">Come back tomorrow for a new one ✨</div>
   </main>
 
-  <script>
-    const THOUGHTS_URL = 'thoughts.txt'; // same folder
-    let thoughts = [];
-    const thoughtEl = document.getElementById('thought');
-    const btn = document.getElementById('generate-btn');
+  <!-- Simple Install Banner -->
+  <div id="installBanner" class="simple-banner">
+    <div class="banner-content">
+      <img src="logo.jpg" alt="Jimmy" class="banner-icon" />
+      <div class="banner-text">
+        <div class="banner-title">Install Jimmy in the House</div>
+        <div class="banner-subtitle">Add to home screen</div>
+      </div>
+      <div class="banner-buttons">
+        <button id="installBtn" class="install-btn">Install</button>
+        <button id="dismissBtn" class="dismiss-btn">×</button>
+      </div>
+    </div>
+  </div>
 
-    let last = -1;
-    function randomIndex(){
-      if (thoughts.length < 2) return 0;
-      let i = Math.floor(Math.random() * thoughts.length);
-      if (i === last) i = (i + 1) % thoughts.length;
-      last = i;
-      return i;
-    }
-
-    function showThought(){
-      if(!thoughts.length){
-        thoughtEl.textContent = 'No thoughts loaded yet.';
-        return;
-      }
-      thoughtEl.textContent = thoughts[randomIndex()];
-    }
-
-    async function loadThoughts(){
-      try {
-        const res = await fetch(THOUGHTS_URL, { cache: 'no-store' });
-        if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
-        const text = await res.text();
-        thoughts = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-        if (!thoughts.length) throw new Error('File is empty');
-      } catch (err){
-        console.error('Failed to load thoughts:', err);
-        // Fallback seeds so the page still works
-        thoughts = [
-          'Ship small, ship often.',
-          'If it’s not on the calendar, it does not exist.',
-          'Done is a feature.',
-          'Focus is a superpower.',
-          'Touch grass. Then touch code.'
-        ];
-        thoughtEl.textContent = 'Could not load thoughts.txt. Using built-in samples.';
-      } finally {
-        btn.disabled = false;
-      }
-    }
-
-    btn.addEventListener('click', showThought);
-    addEventListener('keydown', e => { if(e.code === 'Space'){ e.preventDefault(); showThought(); } });
-
-    (async () => {
-      await loadThoughts();
-      showThought();
-    })();
-  </script>
+  <!-- Scripts -->
+  <script src="config.js?v=3"></script>
+  <script src="js/thoughts.js?v=3"></script>
+  <script src="js/pwa-simple.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
 </body>
 </html>
