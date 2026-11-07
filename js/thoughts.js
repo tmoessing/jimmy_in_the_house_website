@@ -102,8 +102,9 @@ class ThoughtsManager {
       this.thoughtEl.textContent = 'Loading thoughts…';
       
       const thoughts = await this.loadThoughts();
-      const idx = this.indexForDay(thoughts.length, this.dayNumber());
-      this.displayThought(thoughts[idx]);
+      const today = this.dayNumber();
+      this.displayThought(thoughts[this.indexForDay(thoughts.length, today)]);
+      this.renderArchive(thoughts, today);
     } catch (error) {
       console.error('Error initializing thoughts:', error);
       this.showError('Unable to load thoughts. Please check your connection.');
@@ -127,6 +128,36 @@ class ThoughtsManager {
       this.thoughtEl.style.transition = 'opacity 0.3s ease';
       this.thoughtEl.style.opacity = '1';
     });
+  }
+
+  /**
+   * List the thoughts from the previous few days, newest first
+   * @param {string[]} thoughts - All thoughts
+   * @param {number} today - Today's day number
+   * @param {number} days - How many past days to show
+   */
+  renderArchive(thoughts, today, days = 5) {
+    const section = document.getElementById('archive');
+    const list = document.getElementById('archiveList');
+    if (!section || !list) return;
+
+    const fmt = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    const now = new Date();
+    list.replaceChildren();
+
+    for (let back = 1; back <= days; back++) {
+      // Noon avoids landing on the wrong date around daylight-saving changes
+      const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - back, 12);
+      const item = document.createElement('li');
+      const label = document.createElement('time');
+      label.dateTime = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      label.textContent = back === 1 ? 'Yesterday' : fmt.format(date);
+      const text = document.createElement('p');
+      text.textContent = thoughts[this.indexForDay(thoughts.length, today - back)];
+      item.append(label, text);
+      list.append(item);
+    }
+    section.hidden = false;
   }
 
   /**
