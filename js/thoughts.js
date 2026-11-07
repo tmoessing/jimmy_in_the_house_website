@@ -160,12 +160,49 @@ class ThoughtsManager {
       return;
     }
 
-    try {
-      await navigator.clipboard.writeText(`${text}\n${url}`);
+    const message = `${text}\n${url}`;
+    if (await this.copyText(message)) {
       this.flashShareLabel('Copied!');
+    } else {
+      // Last resort: show the text so the person can copy it by hand
+      window.prompt('Copy today\'s thought:', message);
+    }
+  }
+
+  /**
+   * Copy text to the clipboard. Tries the modern Clipboard API first, which
+   * only exists on HTTPS pages and is blocked in some in-app browsers, then
+   * falls back to the older select-and-copy method that works almost anywhere.
+   * @param {string} text - Text to copy
+   * @returns {Promise<boolean>} Whether the copy succeeded
+   */
+  async copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (error) {
+        console.warn('Clipboard API failed, trying fallback:', error);
+      }
+    }
+
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    // Keep it off-screen; 16px font stops iOS from zooming in on focus
+    area.style.cssText = 'position:fixed;top:0;left:-9999px;opacity:0;font-size:16px;';
+    document.body.appendChild(area);
+    try {
+      area.focus();
+      area.select();
+      area.setSelectionRange(0, text.length); // needed on iOS
+      return document.execCommand('copy');
     } catch (error) {
-      console.warn('Copy failed:', error);
-      this.flashShareLabel('Couldn\'t copy');
+      console.warn('Fallback copy failed:', error);
+      return false;
+    } finally {
+      area.remove();
+      this.shareBtn.focus();
     }
   }
 
