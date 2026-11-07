@@ -104,14 +104,69 @@ class ThoughtsManager {
       // Show loading state
       this.thoughtEl.textContent = 'Loading thoughts…';
       
-      const thoughts = await this.loadThoughts();
-      const today = this.dayNumber();
-      this.displayThought(thoughts[this.indexForDay(thoughts.length, today)]);
-      this.renderArchive(thoughts, today);
+      this.thoughts = await this.loadThoughts();
+      this.showDay();
+      this.startCountdown();
     } catch (error) {
       console.error('Error initializing thoughts:', error);
       this.showError('Unable to load thoughts. Please check your connection.');
     }
+  }
+
+  /**
+   * Show the thought and past thoughts for the current day
+   */
+  showDay() {
+    this.today = this.dayNumber();
+    this.displayThought(this.thoughts[this.indexForDay(this.thoughts.length, this.today)]);
+    this.renderArchive(this.thoughts, this.today);
+  }
+
+  /**
+   * Tick a "Next thought in ..." countdown to local midnight, and switch
+   * to the new day's thought when it arrives, without a page reload.
+   */
+  startCountdown() {
+    this.countdownEl = document.getElementById('countdown');
+    if (!this.countdownEl) return;
+
+    const tick = () => {
+      // A new day started (midnight passed, or the tab slept through it)
+      if (this.dayNumber() !== this.today) this.showDay();
+      this.countdownEl.textContent = `Next thought in ${this.formatCountdown(this.msUntilMidnight())}`;
+    };
+
+    tick();
+    clearInterval(this.countdownTimer);
+    this.countdownTimer = setInterval(tick, 1000);
+    // Phones pause timers in background tabs; catch up as soon as it's visible
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) tick();
+    });
+  }
+
+  /**
+   * Milliseconds from now until the next local midnight
+   * @returns {number}
+   */
+  msUntilMidnight(now = new Date()) {
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    return midnight - now;
+  }
+
+  /**
+   * Format a duration as "4h 12m 05s", "45m 00s" or "10s"
+   * @param {number} ms - Duration in milliseconds
+   * @returns {string}
+   */
+  formatCountdown(ms) {
+    const total = Math.max(0, Math.ceil(ms / 1000));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = String(total % 60).padStart(2, '0');
+    if (h > 0) return `${h}h ${String(m).padStart(2, '0')}m ${s}s`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${total % 60}s`;
   }
 
   /**
