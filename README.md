@@ -9,7 +9,6 @@ A Progressive Web App that delivers daily quirky thoughts and insights. Built wi
 - 🔄 **Offline Support**: Works without internet connection
 - 🎨 **Modern UI**: Beautiful, responsive design with glassmorphism effects
 - ⚡ **Fast Loading**: Optimized performance with service worker caching
-- 📲 **Install Banner**: Smart install prompts for mobile users
 
 ## Project Structure
 
@@ -34,7 +33,6 @@ jimmy_in_the_house_website/
 ### PWA Features
 - **Web App Manifest**: Defines app metadata and installation behavior
 - **Service Worker**: Handles caching and offline functionality
-- **Install Prompt**: Smart banner for mobile installation
 - **Responsive Design**: Optimized for all screen sizes
 
 ### Architecture
@@ -52,8 +50,8 @@ jimmy_in_the_house_website/
 
 1. **Clone or download** the project files
 2. **Serve from HTTPS** (required for PWA functionality)
-3. **Open in mobile browser** to see install banner
-4. **Tap "Install"** to add to home screen
+3. **Open in mobile browser** and use the browser menu
+4. **Choose "Add to Home Screen"** to install
 
 ## Development
 
@@ -110,7 +108,6 @@ Update `manifest.json` for app metadata:
 | PWA Install | ✅ | ✅ | ✅ | ✅ |
 | Service Worker | ✅ | ✅ | ✅ | ✅ |
 | Offline Support | ✅ | ✅ | ✅ | ✅ |
-| Install Banner | ✅ | ❌ | ❌ | ✅ |
 
 ## Performance
 

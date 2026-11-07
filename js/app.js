@@ -65,11 +65,10 @@ class App {
   }
 
   /**
-   * Initialize PWA manager - using simple banner
+   * Initialize PWA manager (install banner removed)
    */
   initializePWA() {
-    // Simple banner is handled by pwa-simple.js
-    console.log('PWA initialization handled by simple banner');
+    console.log('PWA install banner disabled');
   }
 
   /**
