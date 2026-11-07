@@ -6,9 +6,8 @@ A Progressive Web App that delivers daily quirky thoughts and insights. Built wi
 
 - 🎯 **Daily Thoughts**: Fresh, quirky insights delivered daily
 - 📱 **PWA Support**: Install on mobile devices with native app experience
-- 🔄 **Offline Support**: Works without internet connection
 - 🎨 **Modern UI**: Beautiful, responsive design with glassmorphism effects
-- ⚡ **Fast Loading**: Optimized performance with service worker caching
+- ⚡ **Fast Loading**: Plain HTML, CSS and JS with no build step
 
 ## Project Structure
 
@@ -17,29 +16,28 @@ jimmy_in_the_house_website/
 ├── index.html              # Main HTML file
 ├── styles.css              # All CSS styles
 ├── manifest.json           # PWA manifest
-├── sw.js                   # Service worker
 ├── thoughts.txt            # Daily thoughts database
 ├── logo.jpg                # App logo
 ├── icon-192.png            # 192x192 app icon
 ├── icon-512.png            # 512x512 app icon
+├── icon-maskable-*.png     # Padded icons for Android adaptive shapes
+├── apple-touch-icon.png    # 180x180 iOS home screen icon
+├── config.js               # App settings and fallback thoughts
 └── js/                     # JavaScript modules
     ├── app.js              # Main application entry point
-    ├── thoughts.js         # Thoughts management
-    └── pwa.js              # PWA functionality
+    └── thoughts.js         # Thoughts management
 ```
 
 ## Technical Implementation
 
 ### PWA Features
 - **Web App Manifest**: Defines app metadata and installation behavior
-- **Service Worker**: Handles caching and offline functionality
 - **Responsive Design**: Optimized for all screen sizes
 
 ### Architecture
 - **Modular JavaScript**: Separated concerns with ES6 classes
 - **CSS Variables**: Consistent theming and easy customization
 - **Error Handling**: Graceful fallbacks and user feedback
-- **Performance**: Optimized loading and caching strategies
 
 ### Browser Support
 - Modern browsers with PWA support
@@ -69,9 +67,8 @@ php -S localhost:8000
 
 ### PWA Testing
 - Use Chrome DevTools > Application tab
-- Test install prompts on mobile devices
-- Verify offline functionality
-- Check service worker registration
+- Check the Manifest panel for icon and install warnings
+- Test "Add to Home Screen" on real devices
 
 ## Customization
 
@@ -106,8 +103,6 @@ Update `manifest.json` for app metadata:
 | Feature | Chrome | Firefox | Safari | Edge |
 |---------|--------|---------|--------|------|
 | PWA Install | ✅ | ✅ | ✅ | ✅ |
-| Service Worker | ✅ | ✅ | ✅ | ✅ |
-| Offline Support | ✅ | ✅ | ✅ | ✅ |
 
 ## Performance
 
@@ -134,4 +129,3 @@ For issues or questions:
 - Check browser console for errors
 - Verify HTTPS requirement for PWA
 - Test on actual mobile devices
-- Ensure service worker registration success

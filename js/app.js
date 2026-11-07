@@ -1,12 +1,11 @@
 /**
  * Main Application Entry Point
- * Initializes the Jimmy in the House app with performance optimizations
+ * Initializes the Jimmy in the House app
  */
 
 class App {
   constructor() {
     this.thoughtsManager = null;
-    this.pwaManager = null;
     this.isInitialized = false;
   }
 
@@ -37,10 +36,8 @@ class App {
       // Show loading indicator
       this.showLoadingState();
       
-      // Initialize components in parallel for better performance
       const [thoughtsResult] = await Promise.allSettled([
-        this.initializeThoughts(),
-        this.initializePWA()
+        this.initializeThoughts()
       ]);
 
       // Check if thoughts loaded successfully
@@ -62,13 +59,6 @@ class App {
   async initializeThoughts() {
     this.thoughtsManager = new ThoughtsManager();
     await this.thoughtsManager.init();
-  }
-
-  /**
-   * Initialize PWA manager (install banner removed)
-   */
-  initializePWA() {
-    console.log('PWA install banner disabled');
   }
 
   /**
