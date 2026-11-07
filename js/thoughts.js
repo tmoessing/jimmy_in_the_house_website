@@ -18,6 +18,9 @@ class ThoughtsManager {
   // Day 0 of the rotation. Changing this changes which thought shows each day.
   static EPOCH = Date.UTC(2025, 0, 1);
 
+  // How many past days the archive can show in total (yesterday + the rest)
+  static ARCHIVE_DAYS = 5;
+
   /**
    * Number of whole days since EPOCH, using the visitor's local calendar date.
    * Date.UTC on the local y/m/d keeps daylight-saving shifts out of the math.
@@ -131,33 +134,61 @@ class ThoughtsManager {
   }
 
   /**
-   * List the thoughts from the previous few days, newest first
+   * Set up the past thoughts list: show yesterday, and wire the
+   * "See more" button to reveal the rest of the past few days
    * @param {string[]} thoughts - All thoughts
    * @param {number} today - Today's day number
-   * @param {number} days - How many past days to show
    */
-  renderArchive(thoughts, today, days = 5) {
+  renderArchive(thoughts, today) {
     const section = document.getElementById('archive');
-    const list = document.getElementById('archiveList');
-    if (!section || !list) return;
+    this.archiveList = document.getElementById('archiveList');
+    this.moreBtn = document.getElementById('moreBtn');
+    if (!section || !this.archiveList) return;
 
-    const fmt = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    this.archiveThoughts = thoughts;
+    this.archiveToday = today;
+    this.archiveShown = 0;
+    this.archiveList.replaceChildren();
+
+    if (this.moreBtn) {
+      this.moreBtn.onclick = () => this.showMoreDays(ThoughtsManager.ARCHIVE_DAYS);
+    }
+
+    this.showMoreDays(1);
+    section.hidden = this.archiveShown === 0;
+  }
+
+  /**
+   * Append earlier days to the past thoughts list, up to ARCHIVE_DAYS
+   * in total, and never before EPOCH (the first day of the rotation).
+   * @param {number} count - How many more days to add
+   */
+  showMoreDays(count) {
     const now = new Date();
-    list.replaceChildren();
+    const fmt = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    const fmtYear = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    const oldest = Math.min(ThoughtsManager.ARCHIVE_DAYS, this.archiveToday);
+    const end = Math.min(this.archiveShown + count, oldest);
 
-    for (let back = 1; back <= days; back++) {
+    for (let back = this.archiveShown + 1; back <= end; back++) {
       // Noon avoids landing on the wrong date around daylight-saving changes
       const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - back, 12);
       const item = document.createElement('li');
       const label = document.createElement('time');
       label.dateTime = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-      label.textContent = back === 1 ? 'Yesterday' : fmt.format(date);
+      if (back === 1) {
+        label.textContent = 'Yesterday';
+      } else {
+        label.textContent = (date.getFullYear() === now.getFullYear() ? fmt : fmtYear).format(date);
+      }
       const text = document.createElement('p');
-      text.textContent = thoughts[this.indexForDay(thoughts.length, today - back)];
+      text.textContent = this.archiveThoughts[this.indexForDay(this.archiveThoughts.length, this.archiveToday - back)];
       item.append(label, text);
-      list.append(item);
+      this.archiveList.append(item);
     }
-    section.hidden = false;
+
+    this.archiveShown = Math.max(this.archiveShown, end);
+    if (this.moreBtn) this.moreBtn.hidden = this.archiveShown >= oldest;
   }
 
   /**
