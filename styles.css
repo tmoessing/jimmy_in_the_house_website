@@ -141,6 +141,7 @@ p.sub {
 
 .hint {
   margin-top: 14px;
+  font-variant-numeric: tabular-nums;
   color: var(--muted);
   font-size: clamp(13px, 3.4vw, 15px);
 }

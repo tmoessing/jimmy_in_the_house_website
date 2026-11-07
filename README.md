@@ -5,6 +5,7 @@ A Progressive Web App that delivers daily quirky thoughts and insights. Built wi
 ## Features
 
 - 🎯 **Daily Thoughts**: Everyone sees the same quirky thought each day
+- ⏳ **Countdown**: Live timer to the next thought; the page switches over at midnight on its own
 - 🗓️ **Past Thoughts**: See yesterday's thought, and tap to see the 4 days before it
 - 🔗 **Share Button**: Send today's thought with your phone's share sheet (copies to clipboard on desktop)
 - 📱 **PWA Support**: Install on mobile devices with native app experience
