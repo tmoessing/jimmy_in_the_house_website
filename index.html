@@ -20,14 +20,10 @@
   <meta name="msapplication-tap-highlight" content="no" />
   
   <!-- Apple Touch Icons -->
-  <link rel="apple-touch-icon" href="logo.jpg" />
-  <link rel="apple-touch-icon" sizes="152x152" href="logo.jpg" />
-  <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg" />
-  <link rel="apple-touch-icon" sizes="167x167" href="logo.jpg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="styles.css?v=3" />
-  <link rel="stylesheet" href="banner-simple.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
   <main class="wrap" role="main">
@@ -36,31 +32,16 @@
       <h1>Welcome to Jimmy in the House</h1>
     </div>
 
-    <p class="sub">Your Thought of the Day</p>
+    <p class="sub">You Thought of the Day</p>
 
     <div id="thought" aria-live="polite" aria-atomic="true">Loading thoughts…</div>
+    <button id="shareBtn" class="share-btn" type="button" hidden>Share today's thought</button>
     <div class="hint">Come back tomorrow for a new one ✨</div>
   </main>
 
-  <!-- Simple Install Banner -->
-  <div id="installBanner" class="simple-banner">
-    <div class="banner-content">
-      <img src="logo.jpg" alt="Jimmy" class="banner-icon" />
-      <div class="banner-text">
-        <div class="banner-title">Install Jimmy in the House</div>
-        <div class="banner-subtitle">Add to home screen</div>
-      </div>
-      <div class="banner-buttons">
-        <button id="installBtn" class="install-btn">Install</button>
-        <button id="dismissBtn" class="dismiss-btn">×</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Scripts -->
-  <script src="config.js?v=3"></script>
-  <script src="js/thoughts.js?v=3"></script>
-  <script src="js/pwa-simple.js?v=3"></script>
-  <script src="js/app.js?v=3"></script>
+  <script src="config.js?v=4"></script>
+  <script src="js/thoughts.js?v=4"></script>
+  <script src="js/app.js?v=4"></script>
 </body>
 </html>

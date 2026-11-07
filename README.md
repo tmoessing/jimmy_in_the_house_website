@@ -4,12 +4,11 @@ A Progressive Web App that delivers daily quirky thoughts and insights. Built wi
 
 ## Features
 
-- 🎯 **Daily Thoughts**: Fresh, quirky insights delivered daily
+- 🎯 **Daily Thoughts**: Everyone sees the same quirky thought each day
+- 🔗 **Share Button**: Send today's thought with your phone's share sheet (copies to clipboard on desktop)
 - 📱 **PWA Support**: Install on mobile devices with native app experience
-- 🔄 **Offline Support**: Works without internet connection
 - 🎨 **Modern UI**: Beautiful, responsive design with glassmorphism effects
-- ⚡ **Fast Loading**: Optimized performance with service worker caching
-- 📲 **Install Banner**: Smart install prompts for mobile users
+- ⚡ **Fast Loading**: Plain HTML, CSS and JS with no build step
 
 ## Project Structure
 
@@ -18,30 +17,28 @@ jimmy_in_the_house_website/
 ├── index.html              # Main HTML file
 ├── styles.css              # All CSS styles
 ├── manifest.json           # PWA manifest
-├── sw.js                   # Service worker
 ├── thoughts.txt            # Daily thoughts database
 ├── logo.jpg                # App logo
 ├── icon-192.png            # 192x192 app icon
 ├── icon-512.png            # 512x512 app icon
+├── icon-maskable-*.png     # Padded icons for Android adaptive shapes
+├── apple-touch-icon.png    # 180x180 iOS home screen icon
+├── config.js               # App settings and fallback thoughts
 └── js/                     # JavaScript modules
     ├── app.js              # Main application entry point
-    ├── thoughts.js         # Thoughts management
-    └── pwa.js              # PWA functionality
+    └── thoughts.js         # Thoughts management
 ```
 
 ## Technical Implementation
 
 ### PWA Features
 - **Web App Manifest**: Defines app metadata and installation behavior
-- **Service Worker**: Handles caching and offline functionality
-- **Install Prompt**: Smart banner for mobile installation
 - **Responsive Design**: Optimized for all screen sizes
 
 ### Architecture
 - **Modular JavaScript**: Separated concerns with ES6 classes
 - **CSS Variables**: Consistent theming and easy customization
 - **Error Handling**: Graceful fallbacks and user feedback
-- **Performance**: Optimized loading and caching strategies
 
 ### Browser Support
 - Modern browsers with PWA support
@@ -52,8 +49,8 @@ jimmy_in_the_house_website/
 
 1. **Clone or download** the project files
 2. **Serve from HTTPS** (required for PWA functionality)
-3. **Open in mobile browser** to see install banner
-4. **Tap "Install"** to add to home screen
+3. **Open in mobile browser** and use the browser menu
+4. **Choose "Add to Home Screen"** to install
 
 ## Development
 
@@ -71,9 +68,8 @@ php -S localhost:8000
 
 ### PWA Testing
 - Use Chrome DevTools > Application tab
-- Test install prompts on mobile devices
-- Verify offline functionality
-- Check service worker registration
+- Check the Manifest panel for icon and install warnings
+- Test "Add to Home Screen" on real devices
 
 ## Customization
 
@@ -84,6 +80,11 @@ Your new thought here
 Another insightful thought
 Yet another quirky observation
 ```
+
+Each day's thought is picked from the date, so every visitor sees the same one.
+The list is walked in a shuffled order, and no thought repeats until all of them
+have been shown. Adding or removing lines reshuffles the order, so the thought
+shown on the day you edit the file will usually change.
 
 ### Styling
 Modify CSS variables in `styles.css`:
@@ -108,9 +109,6 @@ Update `manifest.json` for app metadata:
 | Feature | Chrome | Firefox | Safari | Edge |
 |---------|--------|---------|--------|------|
 | PWA Install | ✅ | ✅ | ✅ | ✅ |
-| Service Worker | ✅ | ✅ | ✅ | ✅ |
-| Offline Support | ✅ | ✅ | ✅ | ✅ |
-| Install Banner | ✅ | ❌ | ❌ | ✅ |
 
 ## Performance
 
@@ -137,4 +135,3 @@ For issues or questions:
 - Check browser console for errors
 - Verify HTTPS requirement for PWA
 - Test on actual mobile devices
-- Ensure service worker registration success

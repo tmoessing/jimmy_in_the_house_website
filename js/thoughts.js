@@ -1,53 +1,68 @@
 /**
  * Thoughts Management Module
- * Handles loading and displaying daily thoughts
+ * Picks the same thought for everyone each day and handles sharing it
  */
 
 class ThoughtsManager {
   constructor() {
     this.THOUGHTS_URL = window.CONFIG?.THOUGHTS_URL || 'thoughts.txt';
-    this.STORAGE_KEY = window.CONFIG?.STORAGE_KEYS?.DAILY_THOUGHT || 'dailyThought';
     this.thoughtEl = document.getElementById('thought');
-  }
+    this.shareBtn = document.getElementById('shareBtn');
+    this.currentThought = null;
 
-  /**
-   * Get today's date key in YYYY-MM-DD format
-   * @returns {string} Today's date key
-   */
-  todayKey() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-  }
-
-  /**
-   * Read stored thought data from localStorage
-   * @returns {Object|null} Stored data or null
-   */
-  readStore() {
-    try {
-      return JSON.parse(localStorage.getItem(this.STORAGE_KEY) || 'null');
-    } catch (error) {
-      console.warn('Error reading from localStorage:', error);
-      return null;
+    if (this.shareBtn) {
+      this.shareBtn.addEventListener('click', () => this.share());
     }
   }
 
+  // Day 0 of the rotation. Changing this changes which thought shows each day.
+  static EPOCH = Date.UTC(2025, 0, 1);
+
   /**
-   * Write thought index to localStorage
-   * @param {number} index - The thought index to store
+   * Number of whole days since EPOCH, using the visitor's local calendar date.
+   * Date.UTC on the local y/m/d keeps daylight-saving shifts out of the math.
+   * @returns {number} Day number
    */
-  writeStore(index) {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify({ 
-        date: this.todayKey(), 
-        index 
-      }));
-    } catch (error) {
-      console.warn('Error writing to localStorage:', error);
+  dayNumber(date = new Date()) {
+    const today = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+    return Math.floor((today - ThoughtsManager.EPOCH) / 86400000);
+  }
+
+  /**
+   * Small seeded random number generator (mulberry32)
+   * @param {number} seed - Integer seed
+   * @returns {function(): number} Generator returning floats in [0, 1)
+   */
+  seededRandom(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /**
+   * Pick the index of a given day's thought. Every visitor gets the same
+   * answer for the same date. Days are grouped into cycles as long as the
+   * list; each cycle walks a different shuffled order, so no thought repeats
+   * until every thought has been shown once.
+   * @param {number} count - Number of thoughts
+   * @param {number} day - Day number from dayNumber()
+   * @returns {number} Index into the thoughts array
+   */
+  indexForDay(count, day) {
+    const cycle = Math.floor(day / count);
+    const position = ((day % count) + count) % count;
+    const order = Array.from({ length: count }, (_, i) => i);
+    const rand = this.seededRandom(cycle + 1);
+    for (let i = count - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
     }
+    return order[position];
   }
 
   /**
@@ -79,16 +94,6 @@ class ThoughtsManager {
   }
 
   /**
-   * Clamp index to valid range
-   * @param {number} i - Index to clamp
-   * @param {number} len - Array length
-   * @returns {number} Clamped index
-   */
-  clampIdx(i, len) {
-    return Math.max(0, Math.min(i, len - 1));
-  }
-
-  /**
    * Initialize and display today's thought
    */
   async init() {
@@ -97,18 +102,7 @@ class ThoughtsManager {
       this.thoughtEl.textContent = 'Loading thoughts…';
       
       const thoughts = await this.loadThoughts();
-      const stored = this.readStore();
-      const tkey = this.todayKey();
-
-      let idx;
-      if (stored && stored.date === tkey && Number.isInteger(stored.index)) {
-        idx = this.clampIdx(stored.index, thoughts.length);
-      } else {
-        idx = Math.floor(Math.random() * thoughts.length);
-        this.writeStore(idx);
-      }
-
-      // Smooth transition to new thought
+      const idx = this.indexForDay(thoughts.length, this.dayNumber());
       this.displayThought(thoughts[idx]);
     } catch (error) {
       console.error('Error initializing thoughts:', error);
@@ -123,8 +117,10 @@ class ThoughtsManager {
   displayThought(thought) {
     if (!this.thoughtEl) return;
     
+    this.currentThought = thought;
     this.thoughtEl.style.opacity = '0';
     this.thoughtEl.textContent = thought;
+    if (this.shareBtn) this.shareBtn.hidden = false;
     
     // Fade in animation
     requestAnimationFrame(() => {
@@ -143,6 +139,48 @@ class ThoughtsManager {
     this.thoughtEl.textContent = message;
     this.thoughtEl.style.color = 'rgba(255, 255, 255, 0.7)';
     this.thoughtEl.style.fontStyle = 'italic';
+  }
+
+  /**
+   * Share today's thought with the native share sheet, or copy it
+   * to the clipboard where sharing isn't supported (most desktops).
+   */
+  async share() {
+    if (!this.currentThought) return;
+    const url = window.location.origin + window.location.pathname;
+    const text = `"${this.currentThought}" — today's You Thought of the Day from Jimmy in the House`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Jimmy in the House', text, url });
+      } catch (error) {
+        // AbortError just means the person closed the share sheet
+        if (error.name !== 'AbortError') console.warn('Share failed:', error);
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(`${text}\n${url}`);
+      this.flashShareLabel('Copied!');
+    } catch (error) {
+      console.warn('Copy failed:', error);
+      this.flashShareLabel('Couldn\'t copy');
+    }
+  }
+
+  /**
+   * Briefly swap the share button's label, then restore it
+   * @param {string} label - Temporary label
+   */
+  flashShareLabel(label) {
+    const original = this.shareBtn.dataset.label || this.shareBtn.textContent;
+    this.shareBtn.dataset.label = original;
+    this.shareBtn.textContent = label;
+    clearTimeout(this.labelTimer);
+    this.labelTimer = setTimeout(() => {
+      this.shareBtn.textContent = original;
+    }, 2000);
   }
 }
 
