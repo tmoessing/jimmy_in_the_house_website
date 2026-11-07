@@ -4,7 +4,8 @@ A Progressive Web App that delivers daily quirky thoughts and insights. Built wi
 
 ## Features
 
-- 🎯 **Daily Thoughts**: Fresh, quirky insights delivered daily
+- 🎯 **Daily Thoughts**: Everyone sees the same quirky thought each day
+- 🔗 **Share Button**: Send today's thought with your phone's share sheet (copies to clipboard on desktop)
 - 📱 **PWA Support**: Install on mobile devices with native app experience
 - 🎨 **Modern UI**: Beautiful, responsive design with glassmorphism effects
 - ⚡ **Fast Loading**: Plain HTML, CSS and JS with no build step
@@ -79,6 +80,11 @@ Your new thought here
 Another insightful thought
 Yet another quirky observation
 ```
+
+Each day's thought is picked from the date, so every visitor sees the same one.
+The list is walked in a shuffled order, and no thought repeats until all of them
+have been shown. Adding or removing lines reshuffles the order, so the thought
+shown on the day you edit the file will usually change.
 
 ### Styling
 Modify CSS variables in `styles.css`:

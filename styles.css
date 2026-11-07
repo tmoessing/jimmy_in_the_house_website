@@ -108,6 +108,38 @@ p.sub {
   text-wrap: balance;
 }
 
+.share-btn {
+  margin-top: 14px;
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+  font: inherit;
+  font-size: clamp(14px, 3.6vw, 16px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.share-btn:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.share-btn:active {
+  transform: scale(0.97);
+}
+
+.share-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 3px;
+}
+
+.share-btn[hidden] {
+  display: none;
+}
+
 .hint {
   margin-top: 14px;
   color: var(--muted);

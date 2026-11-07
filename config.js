@@ -13,11 +13,6 @@ const CONFIG = {
   THOUGHTS_URL: 'thoughts.txt',
   LOGO_URL: 'logo.jpg',
   
-  // Storage Keys
-  STORAGE_KEYS: {
-    DAILY_THOUGHT: 'dailyThought'
-  },
-  
   // Theme Colors
   THEME: {
     PRIMARY: '#5b2aa8',
