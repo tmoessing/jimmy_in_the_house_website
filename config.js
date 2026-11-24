@@ -1,5 +1,5 @@
 /**
- * Configuration file for Jimmy in the House PWA
+ * Configuration file for Jimmy in the House
  * Centralized settings for easy customization
  */
 
