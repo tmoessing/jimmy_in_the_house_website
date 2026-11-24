@@ -2,12 +2,12 @@
   "name": "Jimmy in the House",
   "short_name": "Jimmy",
   "description": "Your daily thought from Jimmy in the House - a collection of quirky, thought-provoking insights",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#5b2aa8",
   "theme_color": "#5b2aa8",
   "orientation": "portrait-primary",
-  "scope": "/",
+  "scope": "./",
   "icons": [
     {
       "src": "icon-192.png",

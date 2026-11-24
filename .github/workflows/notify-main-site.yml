@@ -1,0 +1,31 @@
+# This site is served from tmoessing.website at /jimmy-in-the-house/.
+# The main site's deploy pulls this repo in, so on every push we just ask
+# it to redeploy.
+#
+# One-time setup: add a repo secret MAIN_SITE_DISPATCH_TOKEN here, holding a
+# fine-grained GitHub token with "Contents: Read and write" on
+# tmoessing/tmoessing.website.
+name: Redeploy main site
+
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger tmoessing.website deploy
+        env:
+          TOKEN: ${{ secrets.MAIN_SITE_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::warning::MAIN_SITE_DISPATCH_TOKEN is not set; run the main site's deploy by hand."
+            exit 0
+          fi
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/tmoessing/tmoessing.website/dispatches \
+            -d '{"event_type":"jimmy-updated"}'
